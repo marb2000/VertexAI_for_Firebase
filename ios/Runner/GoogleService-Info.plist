@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyDGB2gc7WwAe7S9sdnKHC0A06I_nD7X_rE</string>
+	<key>GCM_SENDER_ID</key>
+	<string>580914414210</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.vertexai101</string>
+	<key>PROJECT_ID</key>
+	<string>z-vertexai-for-firebase-01</string>
+	<key>STORAGE_BUCKET</key>
+	<string>z-vertexai-for-firebase-01.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:580914414210:ios:eba92a33c3d09d30d1ea9b</string>
+</dict>
+</plist>

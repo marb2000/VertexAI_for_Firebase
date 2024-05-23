@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "580914414210",
+    "project_id": "z-vertexai-for-firebase-01",
+    "storage_bucket": "z-vertexai-for-firebase-01.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:580914414210:android:b8b42252ff397c26d1ea9b",
+        "android_client_info": {
+          "package_name": "com.example.vertexai_101"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWuB0TWc3iGU8avGFBrIJOCGRJr1Pmhhk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
