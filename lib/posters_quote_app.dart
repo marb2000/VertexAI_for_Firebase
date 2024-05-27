@@ -1,0 +1,155 @@
+import 'dart:io'; // For File handling on mobile
+import 'dart:typed_data'; // For Uint8List
+import 'package:flutter/foundation.dart'; // To check the platform
+import 'package:flutter/material.dart';
+import 'package:firebase_vertexai/firebase_vertexai.dart';
+import 'package:image_picker/image_picker.dart';
+
+// Conditional imports
+import 'package:image_picker_web/image_picker_web.dart'
+    if (dart.library.html) 'dart:html';
+
+// Remember to give permissions to the iOS app to access the photo library in the info.plist file:
+// <key>NSPhotoLibraryUsageDescription</key>
+// <string>This app requires access to your photo libraryes.</string>
+
+// Also, to the Android app:
+// <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+class PosterQuoteApp extends StatefulWidget {
+  const PosterQuoteApp({super.key});
+  @override
+  PosterQuoteAppState createState() => PosterQuoteAppState();
+}
+
+class PosterQuoteAppState extends State<PosterQuoteApp> {
+  Uint8List? _imageBytes; // Store image bytes for the web
+  File? _image;
+  String quote = '';
+  bool isLoading = false;
+  late final GenerativeModel model;
+
+  @override
+  void initState() {
+    super.initState();
+    model = FirebaseVertexAI.instance.generativeModel(
+        model: 'gemini-1.5-flash-preview-0514'); // Model for images
+  }
+
+  Future<void> _getImage() async {
+    try {
+      if (kIsWeb) {
+        final image = await ImagePickerWeb.getImageAsBytes();
+        if (image != null) {
+          setState(() {
+            _imageBytes = image;
+            _image = null;
+          });
+          _generateQuote();
+        }
+      } else {
+        final pickedFile =
+            await ImagePicker().pickImage(source: ImageSource.gallery);
+        if (pickedFile != null) {
+          setState(() {
+            _image = File(pickedFile.path);
+            _imageBytes = null;
+          });
+          _generateQuote();
+        }
+      }
+    } catch (error) {
+      print('Error picking image: $error');
+      // Show an error message to the user
+    }
+  }
+
+  Future<void> _generateQuote() async {
+    if (_image == null && _imageBytes == null) return;
+
+    setState(() => isLoading = true);
+
+    final imagePart = (_image != null)
+        ? DataPart('image/jpeg', await _image!.readAsBytes())
+        : DataPart('image/jpeg', _imageBytes!);
+    final prompt = Content.multi([
+      TextPart("Generate a creative and inspiring quote based on this image."),
+      imagePart
+    ]);
+
+    try {
+      final response = await model.generateContent([prompt]);
+      setState(() {
+        quote = response.text!;
+      });
+    } catch (error) {
+      setState(() {
+        quote = 'An error occurred while generating the quote.';
+      });
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          title: const Text('Inspirational Quotes'),
+        ),
+        body: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                if (_image != null)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.45,
+                      ),
+                      child: Image.file(_image!),
+                    ),
+                  ),
+                if (_imageBytes != null)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.45,
+                      ),
+                      child: Image.memory(_imageBytes!),
+                    ),
+                  ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _getImage,
+                  child: const Text('Choose Image'),
+                ),
+                const SizedBox(height: 20),
+                if (isLoading) const CircularProgressIndicator(),
+                if (quote.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      quote,
+                      style: const TextStyle(fontSize: 18),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                const SizedBox(height: 20),
+                if (quote.isNotEmpty)
+                  ElevatedButton(
+                    onPressed: isLoading ? null : _generateQuote,
+                    child: const Text('Regenerate Quote'),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
