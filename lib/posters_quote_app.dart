@@ -5,10 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:image_picker/image_picker.dart';
 
-// Conditional imports
-import 'package:image_picker_web/image_picker_web.dart'
-    if (dart.library.html) 'dart:html';
-
 // Remember to give permissions to the iOS app to access the photo library in the info.plist file:
 // <key>NSPhotoLibraryUsageDescription</key>
 // <string>This app requires access to your photo libraryes.</string>
@@ -23,7 +19,6 @@ class PosterQuoteApp extends StatefulWidget {
 }
 
 class PosterQuoteAppState extends State<PosterQuoteApp> {
-  Uint8List? _imageBytes; // Store image bytes for the web
   File? _image;
   String quote = '';
   bool isLoading = false;
@@ -32,31 +27,19 @@ class PosterQuoteAppState extends State<PosterQuoteApp> {
   @override
   void initState() {
     super.initState();
-    model = FirebaseVertexAI.instance.generativeModel(
-        model: 'gemini-1.5-flash-preview-0514'); // Model for images
+    model = FirebaseVertexAI.instance
+        .generativeModel(model: 'gemini-1.5-flash'); // Model for images
   }
 
   Future<void> _getImage() async {
     try {
-      if (kIsWeb) {
-        final image = await ImagePickerWeb.getImageAsBytes();
-        if (image != null) {
-          setState(() {
-            _imageBytes = image;
-            _image = null;
-          });
-          _generateQuote();
-        }
-      } else {
-        final pickedFile =
-            await ImagePicker().pickImage(source: ImageSource.gallery);
-        if (pickedFile != null) {
-          setState(() {
-            _image = File(pickedFile.path);
-            _imageBytes = null;
-          });
-          _generateQuote();
-        }
+      final pickedFile =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        setState(() {
+          _image = File(pickedFile.path);
+        });
+        _generateQuote();
       }
     } catch (error) {
       print('Error picking image: $error');
@@ -65,13 +48,11 @@ class PosterQuoteAppState extends State<PosterQuoteApp> {
   }
 
   Future<void> _generateQuote() async {
-    if (_image == null && _imageBytes == null) return;
+    if (_image == null) return;
 
     setState(() => isLoading = true);
 
-    final imagePart = (_image != null)
-        ? DataPart('image/jpeg', await _image!.readAsBytes())
-        : DataPart('image/jpeg', _imageBytes!);
+    final imagePart = DataPart('image/jpeg', await _image!.readAsBytes());
     final prompt = Content.multi([
       TextPart("Generate a creative and inspiring quote based on this image."),
       imagePart
@@ -111,16 +92,6 @@ class PosterQuoteAppState extends State<PosterQuoteApp> {
                         maxHeight: MediaQuery.of(context).size.height * 0.45,
                       ),
                       child: Image.file(_image!),
-                    ),
-                  ),
-                if (_imageBytes != null)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.height * 0.45,
-                      ),
-                      child: Image.memory(_imageBytes!),
                     ),
                   ),
                 const SizedBox(height: 20),
