@@ -73,7 +73,7 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
                 info.image.height.toDouble(),
               );
               isLoading = true;
-              print('$imageSize');
+              //print('$imageSize');
               _detectObjects();
             });
           },
@@ -106,8 +106,8 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
 
     try {
       final response = await model.generateContent([prompt]);
-      var result = response.text;
-      print('Response: $result');
+      //var result = response.text;
+      //print('Response: $result');
       final responseText = response.text!.trim();
 
       if (responseText.startsWith('[') && responseText.endsWith(']')) {
@@ -118,10 +118,10 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
               .toList();
         });
       } else {
-        print('Error detecting objects: $responseText');
+        //print('Error detecting objects: $responseText');
       }
     } catch (error) {
-      print('Error processing image: $error');
+      //print('Error processing image: $error');
     } finally {
       setState(() => isLoading = false);
     }

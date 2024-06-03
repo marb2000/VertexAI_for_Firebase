@@ -1,6 +1,4 @@
 import 'dart:io'; // For File handling on mobile
-import 'dart:typed_data'; // For Uint8List
-import 'package:flutter/foundation.dart'; // To check the platform
 import 'package:flutter/material.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:image_picker/image_picker.dart';
@@ -42,7 +40,7 @@ class PosterQuoteAppState extends State<PosterQuoteApp> {
         _generateQuote();
       }
     } catch (error) {
-      print('Error picking image: $error');
+      //print('Error picking image: $error');
       // Show an error message to the user
     }
   }

@@ -53,7 +53,7 @@ class ChatAppState extends State<ChatApp> {
       // Send the initial welcome message
       _sendMessage(initialMessage: true);
     } catch (error) {
-      print('Error initializing Firebase/VertexAI: $error');
+      //print('Error initializing Firebase/VertexAI: $error');
       // Handle errors appropriately, e.g., show a dialog or error message.
     }
   }
@@ -150,7 +150,7 @@ class ChatAppState extends State<ChatApp> {
       WidgetsBinding.instance
           .addPostFrameCallback((_) => _scrollToBottom()); // Scroll after build
     } catch (error) {
-      print('Error sending message: $error');
+      //print('Error sending message: $error');
       // Handle errors appropriately (e.g., show a snackbar to the user)
     } finally {
       setState(() => _isSendingMessage = false);
