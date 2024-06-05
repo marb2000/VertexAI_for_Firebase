@@ -1,9 +1,8 @@
 import 'dart:io'; // For File handling on mobile
-import 'dart:typed_data'; // For Uint8List
-import 'package:flutter/foundation.dart'; // To check the platform
 import 'package:flutter/material.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:vertexai_101/debuging_model_tools.dart';
 
 // Remember to give permissions to the iOS app to access the photo library in the info.plist file:
 // <key>NSPhotoLibraryUsageDescription</key>
@@ -42,8 +41,7 @@ class PosterQuoteAppState extends State<PosterQuoteApp> {
         _generateQuote();
       }
     } catch (error) {
-      print('Error picking image: $error');
-      // Show an error message to the user
+      ModelDebugingTools.printDebug('Error picking image: $error');
     }
   }
 

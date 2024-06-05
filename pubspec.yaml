@@ -7,14 +7,18 @@ environment:
   sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
-  firebase_app_check: ^0.2.2+6
+  firebase_app_check: ^0.2.2+7
   firebase_core: ^2.31.1
+  firebase_remote_config: ^4.4.7
+  firebase_storage: ^11.7.7
   firebase_vertexai: ^0.1.0+1
   flutter:
     sdk: flutter
   image_picker: ^1.1.1
-  image_picker_web: ^3.1.1
+  image_picker_web: ^4.0.0
   intl: ^0.19.0
+
+
 
 dev_dependencies:
   flutter_test:

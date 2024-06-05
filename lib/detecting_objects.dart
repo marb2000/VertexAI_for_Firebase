@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
+import 'package:vertexai_101/debuging_model_tools.dart';
 
 class DetectedObject {
   final String name;
@@ -73,7 +74,7 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
                 info.image.height.toDouble(),
               );
               isLoading = true;
-              print('$imageSize');
+              //print('$imageSize');
               _detectObjects();
             });
           },
@@ -106,8 +107,6 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
 
     try {
       final response = await model.generateContent([prompt]);
-      var result = response.text;
-      print('Response: $result');
       final responseText = response.text!.trim();
 
       if (responseText.startsWith('[') && responseText.endsWith(']')) {
@@ -118,10 +117,11 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
               .toList();
         });
       } else {
-        print('Error detecting objects: $responseText');
+        ModelDebugingTools.printDebug(
+            'Unexpected response format: $responseText');
       }
     } catch (error) {
-      print('Error processing image: $error');
+      ModelDebugingTools.printDebug('Error processing image: $error');
     } finally {
       setState(() => isLoading = false);
     }
