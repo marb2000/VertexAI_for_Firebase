@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/intl.dart';
+import 'package:vertexai_101/debuging_model_tools.dart';
 import 'dart:ui' as ui;
 import 'package:vertexai_101/order.dart';
 
@@ -17,8 +17,8 @@ class TakeAwayChat extends StatefulWidget {
 class TakeAwayChatState extends State<TakeAwayChat> {
   final List<Map<String, dynamic>> _messages = [];
   final TextEditingController _textController = TextEditingController();
-  GenerativeModel? model;
-  ChatSession? chat;
+  GenerativeModel? _model;
+  ChatSession? _chat;
   bool _isSendingMessage = false;
   final ScrollController _scrollController = ScrollController();
   final FocusNode _textFieldFocusNode = FocusNode();
@@ -42,13 +42,18 @@ class TakeAwayChatState extends State<TakeAwayChat> {
     try {
       await Firebase.initializeApp();
 
-      model = FirebaseVertexAI.instance.generativeModel(
+      _model = FirebaseVertexAI.instance.generativeModel(
         model: 'gemini-1.5-flash',
         systemInstruction:
             Content.system('''User is trying to order food at a restaurant. 
-            Be very cautious before ordering for the ussr, telling the details 
-            of the order, and how much does it cost. Always give the user advice 
+            Be very cautious before ordering for the user, telling the details 
+            of the order, and how much does it cost. Always advice the user  
             based on their past experience on other restaurants. 
+            Try to be pretty concise, and bullet points to enumerate facts. 
+            When you enumerate, start with the date in form of Tue, May 25. then restaurant, the other details.
+            Weeks start in Sunday. 
+            If the user other something, put in a bullet list all the info about the order. 
+            Double check with the user before doing it. 
             The user ID is user123, and today is ${DateTime.now()}'''),
         tools: [
           Tool(functionDeclarations: [
@@ -59,7 +64,7 @@ class TakeAwayChatState extends State<TakeAwayChat> {
         ],
       );
 
-      chat = model!.startChat();
+      _chat = _model!.startChat();
 
       // Send the initial welcome message
       _sendMessage(initialMessage: true);
@@ -89,8 +94,7 @@ class TakeAwayChatState extends State<TakeAwayChat> {
           borderRadius: BorderRadius.circular(8.0),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min, // Add this line
-          //crossAxisAlignment: CrossAxisAlignment.start, // Remove this line
+          mainAxisSize: MainAxisSize.min,
           children: [
             if (message.containsKey('text'))
               Text(
@@ -131,24 +135,24 @@ class TakeAwayChatState extends State<TakeAwayChat> {
         'text': messageText,
         'timestamp': DateTime.now(),
       });
-      _textController.clear(); // Clear the text field
+      _textController.clear();
     });
 
     List<Part> parts = [TextPart(messageText)];
 
     try {
-      var response = await chat?.sendMessage(Content.multi(parts));
+      var response = await _chat?.sendMessage(Content.multi(parts));
 
       // Handle the Function Calls if any
       final functionCalls = response?.functionCalls.toList();
       if (functionCalls!.isNotEmpty) {
         for (var functionCall in functionCalls) {
-          if (kDebugMode) {
-            print("${functionCall.name} ${functionCall.args}");
-          }
+          ModelDebugingTools.printDebug(
+              '${functionCall.name} ${functionCall.args}');
+
           final result =
               await FunctionDeclarations.handleFunctionCall(functionCall);
-          response = await chat?.sendMessage(
+          response = await _chat?.sendMessage(
             Content.functionResponse(functionCall.name, result),
           );
         }
@@ -180,7 +184,7 @@ class TakeAwayChatState extends State<TakeAwayChat> {
   void _resetConversation() {
     setState(() {
       _messages.clear();
-      chat = model?.startChat();
+      _chat = _model?.startChat();
       _sendMessage(initialMessage: true);
     });
   }

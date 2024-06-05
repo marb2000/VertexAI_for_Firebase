@@ -1,34 +1,68 @@
+import 'dart:async';
+
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
+import 'package:vertexai_101/debuging_model_tools.dart';
 
-class StoryApp extends StatefulWidget {
-  const StoryApp({super.key});
+class StoryV2App extends StatefulWidget {
+  const StoryV2App({super.key});
   @override
-  StoryAppState createState() => StoryAppState();
+  StoryV2AppState createState() => StoryV2AppState();
 }
 
-class StoryAppState extends State<StoryApp> {
+class StoryV2AppState extends State<StoryV2App> {
   String _story = '';
   bool _isLoading = false;
   late final GenerativeModel _model;
+  late String _modelName;
+  late String _textprompt;
+  late FirebaseRemoteConfig _remoteConfig;
 
   @override
   void initState() {
     super.initState();
-    _model =
-        FirebaseVertexAI.instance.generativeModel(model: 'gemini-1.5-flash');
-    _generateStory();
+
+    configFirebase().then(onConfigFinished);
+  }
+
+  Future<void> configFirebase() async {
+    await activateAppCheck();
+    await fetchRemoteConfig();
+  }
+
+  Future<void> fetchRemoteConfig() async {
+    _remoteConfig = FirebaseRemoteConfig.instance;
+    await _remoteConfig.fetchAndActivate();
+    _modelName = _remoteConfig.getString('model');
+    _textprompt = _remoteConfig.getString('prompt');
+  }
+
+  Future<void> activateAppCheck() async {
+    //App Check:
+    // Certificate fingerprints: $ keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.debug,
+      appleProvider: AppleProvider.debug,
+    );
+  }
+
+  Future<FutureOr> onConfigFinished(void value) async {
+    // Remote config should be fetched before callin the model
+    _model = FirebaseVertexAI.instance.generativeModel(model: _modelName);
+    await _generateStory();
   }
 
   Future<void> _generateStory() async {
     setState(() => _isLoading = true); // Start loading
 
-    final prompt = [
-      Content.text('Write a story about a magic backpack in 400 words')
-    ];
+    final prompt = [Content.text(_textprompt)];
 
     try {
+      //ModelDebugingTools.printPreCountTokens(_model, prompt);
       final response = await _model.generateContent(prompt);
+      ModelDebugingTools.printUsage(response);
 
       setState(() {
         _story = response.text!;

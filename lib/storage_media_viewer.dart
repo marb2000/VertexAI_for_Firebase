@@ -14,9 +14,9 @@ class StoragePhotoListState extends State<StoragePhotoList> {
   Reference? _selectedPhoto;
   String? _description;
   late final GenerativeModel _model;
-  late final _storageRef;
+  late final Reference _storageRef;
   bool _isLoading = false;
-  late Image _image;
+  Image? _image;
 
   @override
   void initState() {
@@ -30,24 +30,24 @@ class StoragePhotoListState extends State<StoragePhotoList> {
   }
 
   Future<void> _fetchPhotoRefs() async {
-    final storageRef = FirebaseStorage.instance.ref().child('Photos');
-    final listResult = await storageRef.listAll();
+    final photosStorageRef = _storageRef.child('Photos');
+    final listResult = await photosStorageRef.listAll();
     setState(() {
       _photoRefs = listResult.items;
     });
   }
 
-  Future<void> _selectPhoto(Reference photoRef) async {
-    //Future<dynamic> image =   await photoRef.getDownloadURL();
-
+  Future<void> _selectPhoto(Reference storageItemRef) async {
+    final imageBytes = await storageItemRef.getData();
     setState(() {
+      _image = Image.memory(imageBytes!);
       _description = null;
       _isLoading = true;
-      _selectedPhoto = photoRef; // Update the selected photo immediately
+      _selectedPhoto = storageItemRef; // Update the selected photo immediately
     });
 
     try {
-      var filePart = await _createFileData(photoRef);
+      var filePart = await _createFileData(storageItemRef);
       var textPart =
           TextPart('''Describe the photo. First and overview of the photo, 
       and then the details of each part of the photo''');
@@ -103,38 +103,44 @@ class StoragePhotoListState extends State<StoragePhotoList> {
                       },
                     ),
                   ),
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.5,
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (_selectedPhoto != null)
-                          Text(
-                            _selectedPhoto!.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                        const SizedBox(height: 16),
-
-                        // Use SizedBox to control the text area size
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height *
-                              0.3, // 50% of screen height
-                          child: _isLoading
-                              ? const Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                              : SingleChildScrollView(
-                                  child: Text(
-                                    _description ?? '',
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (_selectedPhoto != null)
+                              Text(
+                                _selectedPhoto!.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
                                 ),
+                              ),
+                            const SizedBox(height: 16),
+                            if (_image != null)
+                              Center(
+                                child: SizedBox(
+                                  width: 100, // Set maximum width
+                                  child: _image,
+                                ),
+                              ),
+                            const SizedBox(height: 16),
+                            // Use SizedBox to control the text area size
+                            SizedBox(
+                              child: _isLoading
+                                  ? const Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : Text(
+                                      _description ?? '',
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ],

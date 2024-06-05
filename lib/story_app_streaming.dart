@@ -8,40 +8,39 @@ class StoryAppStreaming extends StatefulWidget {
 }
 
 class StoryAppStreamingState extends State<StoryAppStreaming> {
-  String story = '';
-  bool isGenerating = false; // Use isGenerating to control button state
-  late final GenerativeModel model;
+  String _story = '';
+  bool _isGenerating = false;
+  late final GenerativeModel _model;
 
   @override
   void initState() {
     super.initState();
-    model = FirebaseVertexAI.instance
-        .generativeModel(model: 'gemini-1.5-pro-preview-0409');
+    _model = FirebaseVertexAI.instance.generativeModel(model: 'gemini-1.5-pro');
     _generateStory();
   }
 
   Future<void> _generateStory() async {
-    setState(() => isGenerating = true);
+    setState(() => _isGenerating = true);
 
     final prompt = [
       Content.text('Write a story about a magic backpack in 400 words ')
     ];
 
     try {
-      final responseStream = model.generateContentStream(prompt);
-      story = '';
+      final responseStream = _model.generateContentStream(prompt);
+      _story = '';
 
       await for (final chunk in responseStream) {
         setState(() {
-          story += chunk.text ?? ''; // Update the UI with each new chunk
+          _story += chunk.text ?? ''; // Update the UI with each new chunk
         });
       }
     } catch (error) {
       setState(() {
-        story = 'An error occurred while generating the story.';
+        _story = 'An error occurred while generating the story.';
       });
     } finally {
-      setState(() => isGenerating = false); // Re-enable the button
+      setState(() => _isGenerating = false);
     }
   }
 
@@ -57,7 +56,7 @@ class StoryAppStreamingState extends State<StoryAppStreaming> {
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
-                child: Text(story), // Just display the story
+                child: Text(_story), // Just display the story
               ),
             ),
             Align(
@@ -65,7 +64,7 @@ class StoryAppStreamingState extends State<StoryAppStreaming> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ElevatedButton(
-                  onPressed: isGenerating ? null : _generateStory,
+                  onPressed: _isGenerating ? null : _generateStory,
                   child: const Text('Generate Story'),
                 ),
               ),

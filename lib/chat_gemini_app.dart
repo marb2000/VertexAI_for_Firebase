@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'dart:ui' as ui; // Import for TextDirection
+import 'dart:ui' as ui;
+
+import 'package:vertexai_101/debuging_model_tools.dart';
 
 class ChatApp extends StatefulWidget {
   const ChatApp({super.key});
@@ -20,8 +20,8 @@ class ChatApp extends StatefulWidget {
 class ChatAppState extends State<ChatApp> {
   final List<Map<String, dynamic>> _messages = [];
   final TextEditingController _textController = TextEditingController();
-  GenerativeModel? model;
-  ChatSession? chat;
+  GenerativeModel? _model;
+  ChatSession? _chat;
   bool _isSendingMessage = false;
   final ImagePicker _picker = ImagePicker();
   File? _selectedImage;
@@ -46,15 +46,16 @@ class ChatAppState extends State<ChatApp> {
   Future<void> _initializeFirebaseAndVertexAI() async {
     try {
       await Firebase.initializeApp();
-      model =
+      _model =
           FirebaseVertexAI.instance.generativeModel(model: 'gemini-1.5-flash');
-      chat = model!.startChat();
+      _chat = _model!.startChat();
 
       // Send the initial welcome message
       _sendMessage(initialMessage: true);
     } catch (error) {
-      //print('Error initializing Firebase/VertexAI: $error');
-      // Handle errors appropriately, e.g., show a dialog or error message.
+      if (kDebugMode) {
+        print('Error initializing Firebase/VertexAI: $error');
+      }
     }
   }
 
@@ -124,7 +125,7 @@ class ChatAppState extends State<ChatApp> {
         'timestamp': DateTime.now(),
         if (_selectedImage != null) 'image': _selectedImage!.path,
       });
-      _textController.clear(); // Clear the text field
+      _textController.clear();
     });
 
     List<Part> parts = [TextPart(messageText)];
@@ -136,7 +137,9 @@ class ChatAppState extends State<ChatApp> {
     }
 
     try {
-      final response = await chat?.sendMessage(Content.multi(parts));
+      final response = await _chat?.sendMessage(Content.multi(parts));
+
+      ModelDebugingTools.printUsage(response);
 
       setState(() {
         _messages.add({
@@ -150,8 +153,9 @@ class ChatAppState extends State<ChatApp> {
       WidgetsBinding.instance
           .addPostFrameCallback((_) => _scrollToBottom()); // Scroll after build
     } catch (error) {
-      //print('Error sending message: $error');
-      // Handle errors appropriately (e.g., show a snackbar to the user)
+      if (kDebugMode) {
+        print('Error sending message: $error');
+      }
     } finally {
       setState(() => _isSendingMessage = false);
       _textFieldFocusNode
@@ -171,7 +175,7 @@ class ChatAppState extends State<ChatApp> {
   void _resetConversation() {
     setState(() {
       _messages.clear();
-      chat = model?.startChat();
+      _chat = _model?.startChat();
       _sendMessage(initialMessage: true);
     });
   }

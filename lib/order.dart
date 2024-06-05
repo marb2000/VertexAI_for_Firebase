@@ -54,15 +54,17 @@ class OrderService {
   // date, restaurant name, restaurant type, and price.
   List<Order> getOrdersFromDateRange(
       String userId, DateTime startDate, DateTime endDate) {
-    return _orders
-        .where((order) =>
-                order.userId == userId &&
-                order.date.compareTo(startDate) >=
-                    0 && // Order date is on or after startDate
-                order.date.compareTo(endDate) <=
-                    0 // Order date is on or before endDate
-            )
-        .toList();
+    DateTime normalizedStartDate = DateTime(startDate.year, startDate.month,
+        startDate.day); // Normalize to start of day
+    DateTime normalizedEndDate = DateTime(endDate.year, endDate.month,
+        endDate.day, 23, 59, 59); // Normalize to end of day
+
+    return _orders.where((order) {
+      if (order.userId != userId) return false;
+
+      return order.date.compareTo(normalizedStartDate) >= 0 &&
+          order.date.compareTo(normalizedEndDate) <= 0;
+    }).toList();
   }
 
   // Pleace an order
