@@ -19,6 +19,7 @@ class StoryV2AppState extends State<StoryV2App> {
   late String _modelName;
   late String _textprompt;
   late FirebaseRemoteConfig _remoteConfig;
+  late FirebaseVertexAI _vertexAI;
 
   @override
   void initState() {
@@ -30,6 +31,8 @@ class StoryV2AppState extends State<StoryV2App> {
   Future<void> configFirebase() async {
     await activateAppCheck();
     await fetchRemoteConfig();
+    _vertexAI =
+        FirebaseVertexAI.instanceFor(appCheck: FirebaseAppCheck.instance);
   }
 
   Future<void> fetchRemoteConfig() async {
@@ -50,7 +53,7 @@ class StoryV2AppState extends State<StoryV2App> {
 
   Future<FutureOr> onConfigFinished(void value) async {
     // Remote config should be fetched before callin the model
-    _model = FirebaseVertexAI.instance.generativeModel(model: _modelName);
+    _model = _vertexAI.generativeModel(model: _modelName);
     await _generateStory();
   }
 
