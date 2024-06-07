@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:vertexai_101/debuging_model_tools.dart';
 import 'dart:ui' as ui;
 import 'package:vertexai_101/order.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class TakeAwayChat extends StatefulWidget {
   const TakeAwayChat({super.key});
@@ -22,6 +23,7 @@ class TakeAwayChatState extends State<TakeAwayChat> {
   bool _isSendingMessage = false;
   final ScrollController _scrollController = ScrollController();
   final FocusNode _textFieldFocusNode = FocusNode();
+  final _userID = 'user123';
 
   @override
   void initState() {
@@ -44,17 +46,10 @@ class TakeAwayChatState extends State<TakeAwayChat> {
 
       _model = FirebaseVertexAI.instance.generativeModel(
         model: 'gemini-1.5-flash',
-        systemInstruction:
-            Content.system('''User is trying to order food at a restaurant. 
-            Be very cautious before ordering for the user, telling the details 
-            of the order, and how much does it cost. Always advice the user  
-            based on their past experience on other restaurants. 
-            Try to be pretty concise, and bullet points to enumerate facts. 
-            When you enumerate, start with the date in form of Tue, May 25. then restaurant, the other details.
-            Weeks start in Sunday. 
-            If the user other something, put in a bullet list all the info about the order. 
-            Double check with the user before doing it. 
-            The user ID is user123, and today is ${DateTime.now()}'''),
+        systemInstruction: Content.system(
+            '''${SystemInstructionsPrompts.restaurantOrderingPrompt}.
+            Thw week starts in Sunday.
+            The user ID is $_userID, and today is ${DateTime.now()}'''),
         tools: [
           Tool(functionDeclarations: [
             FunctionDeclarations.getRestaurantTypesVisitedByUserTool,
@@ -97,8 +92,8 @@ class TakeAwayChatState extends State<TakeAwayChat> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (message.containsKey('text'))
-              Text(
-                message['text'],
+              MarkdownBody(
+                data: message['text'],
               ),
             if (message['timestamp'] != null)
               Text(
@@ -437,4 +432,45 @@ class FunctionDeclarations {
       {double defaultValue = 0.0}) {
     return (args[key] as num?)?.toDouble() ?? defaultValue;
   }
+}
+
+class SystemInstructionsPrompts {
+  static String restaurantOrderingPrompt = """
+You are a helpful assistant designed to streamline ordering food at restaurants for the user. Here's how to assist:
+
+1. **Gather Information:**
+    * Ask the user for their desired restaurant and order details.
+    * If the user is unsure, inquire about their preferences (cuisine, price range, dietary restrictions).
+
+2. **Check Order History:**
+    * Review the user's past orders (if available) using the following format:
+        * **Day, Date:** Restaurant Name |  Order Summary | Total Cost 
+    * Example:  Mon, Jun 3: Sushi Palace – 2 Spicy Tuna Rolls, 1 Miso Soup – \$28.50
+
+3. **Provide Recommendations (Optional):**
+    * If the user has previous orders at the chosen restaurant, gently remind them of their past choices.
+    * Example: "You previously enjoyed the Spicy Tuna Rolls at Sushi Palace. Would you like to order that again?"
+    * If the restaurant is new to the user, offer suggestions based on their stated preferences or popular dishes.
+
+4. **Summarize Order:**
+    * Clearly list the items in the user's order, including any modifications.
+    * State the estimated total cost (if available).
+    * Example:
+        * 1 Chicken Caesar Salad (dressing on the side)
+        * 1 Pepperoni Pizza (extra cheese)
+        * 2 Iced Teas
+        * Estimated Total: \$35.00
+
+5. **Confirm Before Placing:**
+    * Always ask for the user's confirmation before finalizing the order.
+    * Example: "Does this order look correct? If yes, I would order it right away."
+
+**Important Considerations:**
+
+* **Clarity:**  Use clear, concise language, and bullet points for easy reading. 
+* **Data Format:**  Follow the specified date format (e.g., Tue, May 25) and week start day (Sunday).
+* **Proactive Assistance:**  Offer relevant suggestions and reminders based on past orders or user preferences.
+* **Double-Check:** Always prioritize accuracy by confirming the order with the user. 
+* **User Control:** The user has the final say in their order. Respect their choices and make adjustments as needed.
+""";
 }

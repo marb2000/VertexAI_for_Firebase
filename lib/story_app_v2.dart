@@ -41,7 +41,9 @@ class StoryV2AppState extends State<StoryV2App> {
 
   Future<void> activateAppCheck() async {
     //App Check:
-    // Certificate fingerprints: $ keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
+    // Certificate fingerprints: $ keytool -list -v
+    // -keystore ~/.android/debug.keystore -alias androiddebugkey
+    // -storepass android -keypass android
     await FirebaseAppCheck.instance.activate(
       androidProvider: AndroidProvider.debug,
       appleProvider: AppleProvider.debug,
@@ -50,7 +52,9 @@ class StoryV2AppState extends State<StoryV2App> {
 
   Future<FutureOr> onConfigFinished(void value) async {
     // Remote config should be fetched before callin the model
-    _model = FirebaseVertexAI.instance.generativeModel(model: _modelName);
+    _model = FirebaseVertexAI.instanceFor(appCheck: FirebaseAppCheck.instance)
+        .generativeModel(model: _modelName);
+
     await _generateStory();
   }
 

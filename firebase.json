@@ -1,1 +1,40 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"z-vertexai-for-firebase-01","appId":"1:580914414210:android:b8b42252ff397c26d1ea9b","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"z-vertexai-for-firebase-01","appId":"1:580914414210:ios:eba92a33c3d09d30d1ea9b","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"macos":{"default":{"projectId":"z-vertexai-for-firebase-01","appId":"1:580914414210:ios:eba92a33c3d09d30d1ea9b","uploadDebugSymbols":false,"fileOutput":"macos/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"z-vertexai-for-firebase-01","configurations":{"android":"1:580914414210:android:b8b42252ff397c26d1ea9b","ios":"1:580914414210:ios:eba92a33c3d09d30d1ea9b","macos":"1:580914414210:ios:eba92a33c3d09d30d1ea9b","web":"1:580914414210:web:7f43665c0201d579d1ea9b"}}}}}}
+{
+    "flutter": {
+        "platforms": {
+            "android": {
+                "default": {
+                    "projectId": "z-vertexai-for-firebase-01",
+                    "appId": "1:580914414210:android:b8b42252ff397c26d1ea9b",
+                    "fileOutput": "android/app/google-services.json"
+                }
+            },
+            "ios": {
+                "default": {
+                    "projectId": "z-vertexai-for-firebase-01",
+                    "appId": "1:580914414210:ios:eba92a33c3d09d30d1ea9b",
+                    "uploadDebugSymbols": false,
+                    "fileOutput": "ios/Runner/GoogleService-Info.plist"
+                }
+            },
+            "macos": {
+                "default": {
+                    "projectId": "z-vertexai-for-firebase-01",
+                    "appId": "1:580914414210:ios:eba92a33c3d09d30d1ea9b",
+                    "uploadDebugSymbols": false,
+                    "fileOutput": "macos/Runner/GoogleService-Info.plist"
+                }
+            },
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "z-vertexai-for-firebase-01",
+                    "configurations": {
+                        "android": "1:580914414210:android:b8b42252ff397c26d1ea9b",
+                        "ios": "1:580914414210:ios:eba92a33c3d09d30d1ea9b",
+                        "macos": "1:580914414210:ios:eba92a33c3d09d30d1ea9b",
+                        "web": "1:580914414210:web:7f43665c0201d579d1ea9b"
+                    }
+                }
+            }
+        }
+    }
+}

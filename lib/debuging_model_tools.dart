@@ -7,8 +7,9 @@ class ModelDebugingTools {
     var promptTokenCount = response.usageMetadata?.promptTokenCount;
     var candidatesTokenCount = response.usageMetadata?.candidatesTokenCount;
     if (kDebugMode) {
-      print(
-          'Total Token Count: $totalTokenCount, Prompt Token Count: $promptTokenCount, Candidates Token Count: $candidatesTokenCount');
+      print('''Total Token Count: $totalTokenCount, 
+          Prompt Token Count: $promptTokenCount, 
+          Candidates Token Count: $candidatesTokenCount''');
     }
   }
 
@@ -17,8 +18,8 @@ class ModelDebugingTools {
     final tokenCount = await model.countTokens(prompt);
 
     if (kDebugMode) {
-      print(
-          'Token count: ${tokenCount.totalTokens}, billable characters: ${tokenCount.totalBillableCharacters}');
+      print('''Token count: ${tokenCount.totalTokens}, 
+          billable characters: ${tokenCount.totalBillableCharacters}''');
     }
   }
 

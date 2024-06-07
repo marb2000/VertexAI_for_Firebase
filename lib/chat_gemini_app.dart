@@ -153,9 +153,7 @@ class ChatAppState extends State<ChatApp> {
       WidgetsBinding.instance
           .addPostFrameCallback((_) => _scrollToBottom()); // Scroll after build
     } catch (error) {
-      if (kDebugMode) {
-        print('Error sending message: $error');
-      }
+      ModelDebugingTools.printDebug('Error sending message: $error');
     } finally {
       setState(() => _isSendingMessage = false);
       _textFieldFocusNode

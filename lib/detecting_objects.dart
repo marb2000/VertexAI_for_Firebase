@@ -39,18 +39,20 @@ class ObjectDetectionApp extends StatefulWidget {
 }
 
 class ObjectDetectionAppState extends State<ObjectDetectionApp> {
-  File? selectedImage;
-  List<DetectedObject> detectedObjects = [];
-  bool isLoading = false;
-  late final GenerativeModel model;
-  int? selectedIndex;
-  Size? imageSize;
+  File? _selectedImage;
+  List<DetectedObject> _detectedObjects = [];
+  bool _isLoading = false;
+  late final GenerativeModel _model;
+  int? _selectedIndex;
+  Size? _imageSize;
 
   @override
   void initState() {
     super.initState();
-    model =
-        FirebaseVertexAI.instance.generativeModel(model: 'gemini-1.5-flash');
+    _model = FirebaseVertexAI.instance.generativeModel(
+      model: 'gemini-1.5-flash',
+      generationConfig: GenerationConfig(responseMimeType: 'application/json'),
+    );
   }
 
   Future<void> _processImage() async {
@@ -59,21 +61,21 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
 
     if (pickedFile != null) {
       setState(() {
-        selectedImage = File(pickedFile.path);
-        detectedObjects.clear(); // Clear rectangles for new image
-        selectedIndex = null; // Reset selected index
+        _selectedImage = File(pickedFile.path);
+        _detectedObjects.clear(); // Clear rectangles for new image
+        _selectedIndex = null; // Reset selected index
       });
 
-      final image = Image.file(selectedImage!);
+      final image = Image.file(_selectedImage!);
       image.image.resolve(const ImageConfiguration()).addListener(
         ImageStreamListener(
           (ImageInfo info, bool _) {
             setState(() {
-              imageSize = Size(
+              _imageSize = Size(
                 info.image.width.toDouble(),
                 info.image.height.toDouble(),
               );
-              isLoading = true;
+              _isLoading = true;
               //print('$imageSize');
               _detectObjects();
             });
@@ -84,46 +86,44 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
   }
 
   Future<void> _detectObjects() async {
-    if (selectedImage == null || imageSize == null) return;
+    if (_selectedImage == null || _imageSize == null) return;
 
     final imagePart =
-        DataPart('image/jpeg', await selectedImage!.readAsBytes());
+        DataPart('image/jpeg', await _selectedImage!.readAsBytes());
     final prompt = Content.multi([
-      TextPart(
-          '''Detect objects in this image with their boundaries (xmin, ymin, xmax, ymax) and then return just the JSON array with the following format, no other text:
-[
-  {
-    "name": "object_name",
-    "bbox": { "xmin": 100, "ymin": 300, "xmax": 500, "ymax": 700 }
-  },
-  {
-    "name": "another_object",
-    "bbox": { "xmin": 105, "ymin": 630, "xmax": 910, "ymax": 820 }
-  }
-]
-'''),
+      TextPart('''Identify and label 5 or less objects present in this image and
+        provide their bounding boxes (xmin, ymin, xmax, ymax). 
+        Return just a JSON array that follows the next pattern:
+              [
+                {
+                  "name": "table",
+                  "bbox": { "xmin": 100, "ymin": 300, "xmax": 500, "ymax": 700 }
+                },
+                {
+                  "name": "lamp",
+                  "bbox": { "xmin": 105, "ymin": 630, "xmax": 910, "ymax": 820 }
+                }
+              ]
+          '''),
       imagePart
     ]);
 
     try {
-      final response = await model.generateContent([prompt]);
-      final responseText = response.text!.trim();
+      final response = await _model.generateContent([prompt]);
+      if (response.text!.isNotEmpty) {
+        final responseText = response.text!.trim();
 
-      if (responseText.startsWith('[') && responseText.endsWith(']')) {
         final List<dynamic> jsonResponse = jsonDecode(responseText);
         setState(() {
-          detectedObjects = jsonResponse
+          _detectedObjects = jsonResponse
               .map((item) => DetectedObject.fromJson(item))
               .toList();
         });
-      } else {
-        ModelDebugingTools.printDebug(
-            'Unexpected response format: $responseText');
       }
     } catch (error) {
       ModelDebugingTools.printDebug('Error processing image: $error');
     } finally {
-      setState(() => isLoading = false);
+      setState(() => _isLoading = false);
     }
   }
 
@@ -146,7 +146,7 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
   }
 
   Widget _buildBodyContent() {
-    if (selectedImage == null) {
+    if (_selectedImage == null) {
       return const Center(child: Text('No image selected'));
     } else {
       return Column(
@@ -157,10 +157,11 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
               fit: StackFit.expand,
               children: [
                 Image.file(
-                  selectedImage!,
+                  _selectedImage!,
                   fit: BoxFit.cover,
                 ),
-                if (isLoading) const Center(child: CircularProgressIndicator()),
+                if (_isLoading)
+                  const Center(child: CircularProgressIndicator()),
                 // Bounding Box Overlay
                 Positioned.fill(
                   child: _buildBoundingBoxOverlay(),
@@ -171,15 +172,15 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
           // Display the object list
           Expanded(
             child: ListView.builder(
-              itemCount: detectedObjects.length,
+              itemCount: _detectedObjects.length,
               itemBuilder: (context, index) {
-                final object = detectedObjects[index];
+                final object = _detectedObjects[index];
                 return ListTile(
                   title: Text(object.name),
                   onTap: () => setState(() {
-                    selectedIndex = index == selectedIndex ? null : index;
+                    _selectedIndex = index == _selectedIndex ? null : index;
                   }),
-                  selected: selectedIndex == index,
+                  selected: _selectedIndex == index,
                 );
               },
             ),
@@ -194,12 +195,12 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Stack(
-          children: detectedObjects.asMap().entries.map((entry) {
+          children: _detectedObjects.asMap().entries.map((entry) {
             final int index = entry.key;
             final DetectedObject object = entry.value;
 
             // Only show bounding box if the item is selected
-            if (index == selectedIndex) {
+            if (index == _selectedIndex) {
               return _buildBoundingBox(object, constraints.biggest);
             } else {
               return const SizedBox

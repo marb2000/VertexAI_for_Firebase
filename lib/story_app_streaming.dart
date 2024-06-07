@@ -49,7 +49,7 @@ class StoryAppStreamingState extends State<StoryAppStreaming> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Magic Backpack Story'),
+          title: const Text('Streaming Magic Backpack Story'),
         ),
         body: Column(
           children: [

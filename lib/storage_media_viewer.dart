@@ -52,9 +52,9 @@ class StoragePhotoListState extends State<StoragePhotoList> {
           TextPart('''Describe the photo. First and overview of the photo, 
       and then the details of each part of the photo''');
 
-      final prompt = Content.multi([textPart, filePart]);
+      final requestContent = Content.multi([textPart, filePart]);
 
-      final response = await _model.generateContent([prompt]);
+      final response = await _model.generateContent([requestContent]);
       setState(() {
         _description = response.text!;
         _isLoading = false;
