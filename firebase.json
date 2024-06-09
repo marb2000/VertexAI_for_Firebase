@@ -3,35 +3,35 @@
         "platforms": {
             "android": {
                 "default": {
-                    "projectId": "z-vertexai-for-firebase-01",
-                    "appId": "1:580914414210:android:b8b42252ff397c26d1ea9b",
+                    "projectId": "vertex-ai-for-firebase",
+                    "appId": "1:787127091202:android:fd46d5b5bc1cdd68bd671b",
                     "fileOutput": "android/app/google-services.json"
                 }
             },
             "ios": {
                 "default": {
-                    "projectId": "z-vertexai-for-firebase-01",
-                    "appId": "1:580914414210:ios:eba92a33c3d09d30d1ea9b",
+                    "projectId": "vertex-ai-for-firebase",
+                    "appId": "1:787127091202:ios:5fd7ee53fe6ab2b8bd671b",
                     "uploadDebugSymbols": false,
                     "fileOutput": "ios/Runner/GoogleService-Info.plist"
                 }
             },
             "macos": {
                 "default": {
-                    "projectId": "z-vertexai-for-firebase-01",
-                    "appId": "1:580914414210:ios:eba92a33c3d09d30d1ea9b",
+                    "projectId": "vertex-ai-for-firebase",
+                    "appId": "1:787127091202:ios:5fd7ee53fe6ab2b8bd671b",
                     "uploadDebugSymbols": false,
                     "fileOutput": "macos/Runner/GoogleService-Info.plist"
                 }
             },
             "dart": {
                 "lib/firebase_options.dart": {
-                    "projectId": "z-vertexai-for-firebase-01",
+                    "projectId": "vertex-ai-for-firebase",
                     "configurations": {
-                        "android": "1:580914414210:android:b8b42252ff397c26d1ea9b",
-                        "ios": "1:580914414210:ios:eba92a33c3d09d30d1ea9b",
-                        "macos": "1:580914414210:ios:eba92a33c3d09d30d1ea9b",
-                        "web": "1:580914414210:web:7f43665c0201d579d1ea9b"
+                        "android": "1:787127091202:android:fd46d5b5bc1cdd68bd671b",
+                        "ios": "1:787127091202:ios:5fd7ee53fe6ab2b8bd671b",
+                        "macos": "1:787127091202:ios:5fd7ee53fe6ab2b8bd671b",
+                        "web": "1:787127091202:web:570388c38d66d05abd671b"
                     }
                 }
             }

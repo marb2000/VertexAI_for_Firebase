@@ -16,6 +16,7 @@ class StoragePhotoListState extends State<StoragePhotoList> {
   late final GenerativeModel _model;
   late final Reference _storageRef;
   bool _isLoading = false;
+  bool _isFetchingPhotos = true;
   Image? _image;
 
   @override
@@ -30,11 +31,35 @@ class StoragePhotoListState extends State<StoragePhotoList> {
   }
 
   Future<void> _fetchPhotoRefs() async {
-    final photosStorageRef = _storageRef.child('Photos');
-    final listResult = await photosStorageRef.listAll();
+    const errorMessage = '''No photos found!\n 
+            \n1 Make sure you've created a "Photos" folder in your Cloud Storage with photos. 
+            \n2 For this demo, the "Photos" folder should be publicly accessible. We'll improve security later 😊''';
+
     setState(() {
-      _photoRefs = listResult.items;
+      _isFetchingPhotos = true;
     });
+
+    try {
+      final photosStorageRef = _storageRef.child('Photos');
+      final listResult = await photosStorageRef.listAll();
+
+      if (listResult.items.isEmpty) {
+        setState(() {
+          _description = errorMessage;
+          _isFetchingPhotos = false;
+        });
+      } else {
+        setState(() {
+          _photoRefs = listResult.items;
+          _isFetchingPhotos = false;
+        });
+      }
+    } catch (error) {
+      setState(() {
+        _description = errorMessage;
+        _isFetchingPhotos = false;
+      });
+    }
   }
 
   Future<void> _selectPhoto(Reference storageItemRef) async {
@@ -48,9 +73,7 @@ class StoragePhotoListState extends State<StoragePhotoList> {
 
     try {
       var filePart = await _createFileData(storageItemRef);
-      var textPart =
-          TextPart('''Describe the photo. First and overview of the photo, 
-      and then the details of each part of the photo''');
+      var textPart = TextPart('''Describe the photo shortly.''');
 
       final requestContent = Content.multi([textPart, filePart]);
 
@@ -85,7 +108,7 @@ class StoragePhotoListState extends State<StoragePhotoList> {
         appBar: AppBar(
           title: const Text('Storage Photo List'),
         ),
-        body: _photoRefs.isEmpty
+        body: _isFetchingPhotos
             ? const Center(child: CircularProgressIndicator())
             : Column(
                 children: [

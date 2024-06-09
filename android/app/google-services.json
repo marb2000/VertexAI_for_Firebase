@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "580914414210",
-    "project_id": "z-vertexai-for-firebase-01",
-    "storage_bucket": "z-vertexai-for-firebase-01.appspot.com"
+    "project_number": "787127091202",
+    "project_id": "vertex-ai-for-firebase",
+    "storage_bucket": "vertex-ai-for-firebase.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:580914414210:android:b8b42252ff397c26d1ea9b",
+        "mobilesdk_app_id": "1:787127091202:android:fd46d5b5bc1cdd68bd671b",
         "android_client_info": {
-          "package_name": "com.example.vertexai_101"
+          "package_name": "com.example.verte"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCWuB0TWc3iGU8avGFBrIJOCGRJr1Pmhhk"
+          "current_key": "AIzaSyAVqMuYUb3Ni_LekaqwkGoZo4p19B2qthw"
         }
       ],
       "services": {

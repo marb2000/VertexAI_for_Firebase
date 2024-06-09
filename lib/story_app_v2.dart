@@ -35,8 +35,13 @@ class StoryV2AppState extends State<StoryV2App> {
   Future<void> fetchRemoteConfig() async {
     _remoteConfig = FirebaseRemoteConfig.instance;
     await _remoteConfig.fetchAndActivate();
-    _modelName = _remoteConfig.getString('model');
-    _textprompt = _remoteConfig.getString('prompt');
+    _modelName = _remoteConfig.getString('modelName');
+    _textprompt = _remoteConfig.getString('promptText');
+
+    if (_modelName.isEmpty || _textprompt.isEmpty) {
+      setState(() => _story =
+          '''Error: Create "modelName" and "promptText"  parameters in Remote Config''');
+    }
   }
 
   Future<void> activateAppCheck() async {
@@ -52,10 +57,11 @@ class StoryV2AppState extends State<StoryV2App> {
 
   Future<FutureOr> onConfigFinished(void value) async {
     // Remote config should be fetched before callin the model
-    _model = FirebaseVertexAI.instanceFor(appCheck: FirebaseAppCheck.instance)
-        .generativeModel(model: _modelName);
-
-    await _generateStory();
+    if (_modelName.isNotEmpty && _textprompt.isNotEmpty) {
+      _model = FirebaseVertexAI.instanceFor(appCheck: FirebaseAppCheck.instance)
+          .generativeModel(model: _modelName);
+      await _generateStory();
+    }
   }
 
   Future<void> _generateStory() async {
@@ -64,7 +70,7 @@ class StoryV2AppState extends State<StoryV2App> {
     final prompt = [Content.text(_textprompt)];
 
     try {
-      //ModelDebugingTools.printPreCountTokens(_model, prompt);
+      ModelDebugingTools.printPreCountTokens(_model, prompt);
       final response = await _model.generateContent(prompt);
       ModelDebugingTools.printUsage(response);
 
@@ -85,7 +91,7 @@ class StoryV2AppState extends State<StoryV2App> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Magic Backpack Story'),
+          title: const Text('Generate Story'),
         ),
         body: Column(
           children: [

@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Features List'),
+          title: const Text('Vertex AI for Firebase Demos'),
         ),
         body: ListView.builder(
           itemCount: widgetList.length,
