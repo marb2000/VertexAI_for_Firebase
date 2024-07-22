@@ -45,10 +45,6 @@ class StoryV2AppState extends State<StoryV2App> {
   }
 
   Future<void> activateAppCheck() async {
-    //App Check:
-    // Certificate fingerprints: $ keytool -list -v
-    // -keystore ~/.android/debug.keystore -alias androiddebugkey
-    // -storepass android -keypass android
     await FirebaseAppCheck.instance.activate(
       androidProvider: AndroidProvider.debug,
       appleProvider: AppleProvider.debug,

@@ -28,6 +28,14 @@ class TakeAwayChatState extends State<TakeAwayChat> {
   @override
   void initState() {
     super.initState();
+    configDebug().then(onConfigFinished);
+  }
+
+  Future<void> configDebug() async {
+    await ModelDebugingTools.setDebugSession();
+  }
+
+  Future<void> onConfigFinished(void value) async {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeFirebaseAndVertexAI();
     });

@@ -21,13 +21,21 @@ class PosterQuoteAppState extends State<PosterQuoteApp> {
   File? _image;
   String quote = '';
   bool isLoading = false;
-  late final GenerativeModel model;
+  late final GenerativeModel _model;
 
   @override
   void initState() {
     super.initState();
-    model = FirebaseVertexAI.instance
-        .generativeModel(model: 'gemini-1.5-flash'); // Model for images
+    configDebug().then(onConfigFinished);
+  }
+
+  Future<void> configDebug() async {
+    await ModelDebugingTools.setDebugSession();
+  }
+
+  Future<void> onConfigFinished(void value) async {
+    _model =
+        FirebaseVertexAI.instance.generativeModel(model: 'gemini-1.5-flash');
   }
 
   Future<void> _getImage() async {
@@ -57,7 +65,7 @@ class PosterQuoteAppState extends State<PosterQuoteApp> {
     ]);
 
     try {
-      final response = await model.generateContent([prompt]);
+      final response = await _model.generateContent([prompt]);
       setState(() {
         quote = response.text!;
       });

@@ -1,6 +1,7 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:flutter/material.dart';
+import 'package:vertexai_101/debuging_model_tools.dart';
 
 class StoragePhotoList extends StatefulWidget {
   const StoragePhotoList({super.key});
@@ -22,7 +23,14 @@ class StoragePhotoListState extends State<StoragePhotoList> {
   @override
   void initState() {
     super.initState();
+    configDebug().then(onConfigFinished);
+  }
 
+  Future<void> configDebug() async {
+    await ModelDebugingTools.setDebugSession();
+  }
+
+  Future<void> onConfigFinished(void value) async {
     _storageRef = FirebaseStorage.instance.ref();
     _model =
         FirebaseVertexAI.instance.generativeModel(model: 'gemini-1.5-flash');
