@@ -97,7 +97,7 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
     if (_selectedImage == null || _imageSize == null) return;
 
     final imagePart =
-        DataPart('image/jpeg', await _selectedImage!.readAsBytes());
+        InlineDataPart('image/jpeg', await _selectedImage!.readAsBytes());
     final prompt = Content.multi([
       TextPart('''Identify and label 5 or less objects present in this image and
         provide their bounding boxes (xmin, ymin, xmax, ymax). 
@@ -229,12 +229,11 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
       height: (object.ymax - object.ymin).toDouble() / 1000 * imageSize.height,
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.blue,
-            width: 2.0,
-          ),
-          color: Colors.blue.withOpacity(0.3),
-        ),
+            border: Border.all(
+              color: Colors.blue,
+              width: 2.0,
+            ),
+            color: Colors.blue.withValues(alpha: 0.3)),
       ),
     );
   }
