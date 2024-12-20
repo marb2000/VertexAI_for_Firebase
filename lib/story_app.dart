@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
+import 'package:vertexai_101/debuging_model_tools.dart';
 
 class StoryApp extends StatefulWidget {
   const StoryApp({super.key});
@@ -15,6 +16,14 @@ class StoryAppState extends State<StoryApp> {
   @override
   void initState() {
     super.initState();
+    configDebug().then(onConfigFinished);
+  }
+
+  Future<void> configDebug() async {
+    await ModelDebugingTools.setDebugSession();
+  }
+
+  Future<void> onConfigFinished(void value) async {
     _model =
         FirebaseVertexAI.instance.generativeModel(model: 'gemini-1.5-flash');
     _generateStory();

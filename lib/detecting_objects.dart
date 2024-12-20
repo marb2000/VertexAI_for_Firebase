@@ -49,6 +49,14 @@ class ObjectDetectionAppState extends State<ObjectDetectionApp> {
   @override
   void initState() {
     super.initState();
+    configDebug().then(onConfigFinished);
+  }
+
+  Future<void> configDebug() async {
+    await ModelDebugingTools.setDebugSession();
+  }
+
+  Future<void> onConfigFinished(void value) async {
     _model = FirebaseVertexAI.instance.generativeModel(
       model: 'gemini-1.5-flash',
       generationConfig: GenerationConfig(responseMimeType: 'application/json'),
