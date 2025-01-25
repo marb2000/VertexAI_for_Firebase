@@ -58,7 +58,7 @@ class PosterQuoteAppState extends State<PosterQuoteApp> {
 
     setState(() => isLoading = true);
 
-    final imagePart = DataPart('image/jpeg', await _image!.readAsBytes());
+    final imagePart = InlineDataPart('image/jpeg', await _image!.readAsBytes());
     final prompt = Content.multi([
       TextPart("Generate a creative and inspiring quote based on this image."),
       imagePart

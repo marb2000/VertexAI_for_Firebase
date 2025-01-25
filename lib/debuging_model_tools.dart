@@ -1,4 +1,4 @@
-import 'package:firebase_app_check/firebase_app_check.dart';
+//import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:flutter/foundation.dart';
 
@@ -34,11 +34,14 @@ class ModelDebugingTools {
 
   static Future<void> setDebugSession() async {
     // This is only for demo proposals.
+    /* Uncomment for demonstrate App Check
     await FirebaseAppCheck.instance.activate(
       androidProvider: AndroidProvider.debug,
       appleProvider: AppleProvider.debug,
     );
     FirebaseVertexAI.instanceFor(appCheck: FirebaseAppCheck.instance)
         .generativeModel(model: 'gemini-1.5-flash');
+    */
+    FirebaseVertexAI.instance.generativeModel(model: 'gemini-1.5-flash');
   }
 }

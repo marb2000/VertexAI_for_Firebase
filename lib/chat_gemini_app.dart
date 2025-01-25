@@ -140,7 +140,7 @@ class ChatAppState extends State<ChatApp> {
 
     if (_selectedImage != null) {
       Uint8List imageBytes = await _selectedImage!.readAsBytes();
-      parts.add(DataPart('image/jpeg', imageBytes));
+      parts.add(InlineDataPart('image/jpeg', imageBytes));
       _selectedImage = null; // Clear the image after sending
     }
 

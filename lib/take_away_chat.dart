@@ -59,7 +59,7 @@ class TakeAwayChatState extends State<TakeAwayChat> {
             Thw week starts in Sunday.
             The user ID is $_userID, and today is ${DateTime.now()}'''),
         tools: [
-          Tool(functionDeclarations: [
+          Tool.functionDeclarations([
             FunctionDeclarations.getRestaurantTypesVisitedByUserTool,
             FunctionDeclarations.getOrdersFromDateRangeTool,
             FunctionDeclarations.placeOrderTool,
@@ -276,18 +276,9 @@ class FunctionDeclarations {
   static final getRestaurantTypesVisitedByUserTool = FunctionDeclaration(
     'getRestaurantTypesVisitedByUser',
     'Returns a list of unique restaurant types visited by a user.',
-    Schema(
-      SchemaType.object,
-      properties: {
-        'userId': Schema(
-          SchemaType.string,
-          description: 'The ID of the user.',
-        ),
-      },
-      requiredProperties: [
-        'userId',
-      ],
-    ),
+    parameters: {
+      'userId': Schema.string(description: 'The ID of the user.'),
+    },
   );
 
   static final getOrdersFromDateRangeTool = FunctionDeclaration(
@@ -295,79 +286,49 @@ class FunctionDeclarations {
     '''Returns a list of orders placed by a user within a specific date range. 
     The orders contains information about what items the user ordered,date, 
     restaurant name, restaurant type, and price.''',
-    Schema(
-      SchemaType.object,
-      properties: {
-        'userId': Schema(
-          SchemaType.string,
-          description: 'The ID of the user.',
-        ),
-        'startDate': Schema(
-          SchemaType.string,
-          description: 'The start date of the date range in YYYY-MM-DD format.',
-        ),
-        'endDate': Schema(
-          SchemaType.string,
-          description: 'The end date of the date range in YYYY-MM-DD format.',
-        ),
-      },
-      requiredProperties: [
-        'userId',
-        'startDate',
-        'endDate',
-      ],
-    ),
+    parameters: {
+      'userId': Schema.string(
+        description: 'The ID of the user.',
+      ),
+      'startDate': Schema.string(
+        description: 'The start date of the date range in YYYY-MM-DD format.',
+      ),
+      'endDate': Schema.string(
+        description: 'The end date of the date range in YYYY-MM-DD format.',
+      ),
+    },
   );
 
   static final placeOrderTool = FunctionDeclaration(
     'placeOrder',
     '''Places a new order for a user. Use this function to create a new order 
     and sent it to the restaurant.''',
-    Schema(
-      SchemaType.object,
-      properties: {
-        'userId': Schema(
-          SchemaType.string,
-          description: 'The ID of the user placing the order.',
-        ),
-        'date': Schema(
-          SchemaType.string,
-          description: 'The date of the order in YYYY-MM-DD format.',
-        ),
-        'restaurantName': Schema(
-          SchemaType.string,
-          description: 'The name of the restaurant.',
-        ),
-        'restaurantType': Schema(
-          SchemaType.string,
-          description: 'The type of restaurant.',
-        ),
-        'orderDetails': Schema(
-          SchemaType.string,
-          description: 'The details of the order.',
-        ),
-        'price': Schema(
-          SchemaType.number,
-          description: 'The total price of the order.',
-        ),
-        'tipPercentage': Schema(
-          SchemaType.number,
-          description: 'The tip percentage applied to the order.',
-        ),
-        'taxRate': Schema(
-          SchemaType.number,
-          description: 'The tax rate applied to the order.',
-        ),
-      },
-      requiredProperties: [
-        'userId',
-        'date',
-        'restaurantName',
-        'restaurantType',
-        'orderDetails',
-        'price',
-      ],
-    ),
+    parameters: {
+      'userId': Schema.string(
+        description: 'The ID of the user placing the order.',
+      ),
+      'date': Schema.string(
+        description: 'The date of the order in YYYY-MM-DD format.',
+      ),
+      'restaurantName': Schema.string(
+        description: 'The name of the restaurant.',
+      ),
+      'restaurantType': Schema.string(
+        description: 'The type of restaurant.',
+      ),
+      'orderDetails': Schema.string(
+        description: 'The details of the order.',
+      ),
+      'price': Schema.number(
+        description: 'The total price of the order.',
+      ),
+      'tipPercentage': Schema.number(
+        description: 'The tip percentage applied to the order.',
+      ),
+      'taxRate': Schema.number(
+        description: 'The tax rate applied to the order.',
+      ),
+    },
   );
 
   static Future<Map<String, Object?>> handleFunctionCall(

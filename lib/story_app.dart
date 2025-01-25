@@ -32,15 +32,17 @@ class StoryAppState extends State<StoryApp> {
   Future<void> _generateStory() async {
     setState(() => _isLoading = true); // Start loading
 
-    final prompt = [
-      Content.text('Write a story about a magic backpack in 400 words')
-    ];
+final model =
+        FirebaseVertexAI.instance.generativeModel(model: 'gemini-1.5-flash');     
+final response = 
+await model.generateContent([Content.text('Write a story about a magic backpack')]);
+final story = response.text!;
+
 
     try {
-      final response = await _model.generateContent(prompt);
+      
 
       setState(() {
-        _story = response.text!;
       });
     } catch (error) {
       setState(() {
